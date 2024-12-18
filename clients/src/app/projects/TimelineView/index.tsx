@@ -10,6 +10,7 @@ type Props = {
 };
 
 type TaskTypeItems = "task" | "milestone" | "project";
+
 const Timeline = ({ id, setIsModalNewTaskOpen }: Props) => {
   const isDarkMode = useAppSelector((state) => state.global.isDarkMode);
   const {
@@ -17,6 +18,7 @@ const Timeline = ({ id, setIsModalNewTaskOpen }: Props) => {
     error,
     isLoading,
   } = useGetTasksQuery({ projectId: Number(id) });
+
   const [displayOptions, setDisplayOptions] = useState<DisplayOption>({
     viewMode: ViewMode.Month,
     locale: "en-US",
@@ -66,6 +68,7 @@ const Timeline = ({ id, setIsModalNewTaskOpen }: Props) => {
           </select>
         </div>
       </div>
+
       <div className="overflow-hidden rounded-md bg-white shadow dark:bg-dark-secondary dark:text-white">
         <div className="timeline">
           <Gantt

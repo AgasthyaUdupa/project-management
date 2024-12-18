@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useGetTasksQuery, useUpdateTaskStatusMutation } from "@/state/api";
 import React from "react";
 import { DndProvider, useDrag, useDrop } from "react-dnd";
@@ -26,8 +25,10 @@ const BoardView = ({ id, setIsModalNewTaskOpen }: BoardProps) => {
   const moveTask = (taskId: number, toStatus: string) => {
     updateTaskStatus({ taskId, status: toStatus });
   };
+
   if (isLoading) return <div>Loading...</div>;
   if (error) return <div>An error occurred while fetching tasks</div>;
+
   return (
     <DndProvider backend={HTML5Backend}>
       <div className="grid grid-cols-1 gap-4 p-4 md:grid-cols-2 xl:grid-cols-4">
@@ -61,7 +62,6 @@ const TaskColumn = ({
   const [{ isOver }, drop] = useDrop(() => ({
     accept: "task",
     drop: (item: { id: number }) => moveTask(item.id, status),
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     collect: (monitor: any) => ({
       isOver: !!monitor.isOver(),
     }),
@@ -69,13 +69,13 @@ const TaskColumn = ({
 
   const tasksCount = tasks.filter((task) => task.status === status).length;
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const statusColor: any = {
     "To Do": "#2563EB",
     "Work In Progress": "#059669",
     "Under Review": "#D97706",
     Completed: "#000000",
   };
+
   return (
     <div
       ref={(instance) => {
@@ -111,6 +111,7 @@ const TaskColumn = ({
           </div>
         </div>
       </div>
+
       {tasks
         .filter((task) => task.status === status)
         .map((task) => (
@@ -151,14 +152,17 @@ const Task = ({ task }: TaskProps) => {
           ? "bg-red-200 text-red-700"
           : priority === "High"
             ? "bg-yellow-200 text-yellow-700"
-            : priority === "Low"
-              ? "bg-blue-200 text-blue-700"
-              : "bg-gray-200 text-gray-700"
+            : priority === "Medium"
+              ? "bg-green-200 text-green-700"
+              : priority === "Low"
+                ? "bg-blue-200 text-blue-700"
+                : "bg-gray-200 text-gray-700"
       }`}
     >
       {priority}
     </div>
   );
+
   return (
     <div
       ref={(instance) => {
@@ -170,7 +174,7 @@ const Task = ({ task }: TaskProps) => {
     >
       {task.attachments && task.attachments.length > 0 && (
         <Image
-          src={`/${task.attachments[0].fileURL}`}
+          src={`https://pm-s3-images.s3.us-east-2.amazonaws.com/${task.attachments[0].fileURL}`}
           alt={task.attachments[0].fileName}
           width={400}
           height={200}
@@ -187,6 +191,7 @@ const Task = ({ task }: TaskProps) => {
                   key={tag}
                   className="rounded-full bg-blue-100 px-2 py-1 text-xs"
                 >
+                  {" "}
                   {tag}
                 </div>
               ))}
@@ -196,6 +201,7 @@ const Task = ({ task }: TaskProps) => {
             <EllipsisVertical size={26} />
           </button>
         </div>
+
         <div className="my-3 flex justify-between">
           <h4 className="text-md font-bold dark:text-white">{task.title}</h4>
           {typeof task.points === "number" && (
@@ -204,6 +210,7 @@ const Task = ({ task }: TaskProps) => {
             </div>
           )}
         </div>
+
         <div className="text-xs text-gray-500 dark:text-neutral-500">
           {formattedStartDate && <span>{formattedStartDate} - </span>}
           {formattedDueDate && <span>{formattedDueDate}</span>}
@@ -213,13 +220,13 @@ const Task = ({ task }: TaskProps) => {
         </p>
         <div className="mt-4 border-t border-gray-200 dark:border-stroke-dark" />
 
-        {/* USERS */}
+        {/* Users */}
         <div className="mt-3 flex items-center justify-between">
           <div className="flex -space-x-[6px] overflow-hidden">
             {task.assignee && (
               <Image
                 key={task.assignee.userId}
-                src={`/${task.assignee.profilePictureUrl!}`}
+                src={`https://pm-s3-images.s3.us-east-2.amazonaws.com/${task.assignee.profilePictureUrl!}`}
                 alt={task.assignee.username}
                 width={30}
                 height={30}
@@ -229,7 +236,7 @@ const Task = ({ task }: TaskProps) => {
             {task.author && (
               <Image
                 key={task.author.userId}
-                src={`/${task.author.profilePictureUrl!}`}
+                src={`https://pm-s3-images.s3.us-east-2.amazonaws.com/${task.author.profilePictureUrl!}`}
                 alt={task.author.username}
                 width={30}
                 height={30}
@@ -238,7 +245,7 @@ const Task = ({ task }: TaskProps) => {
             )}
           </div>
           <div className="flex items-center text-gray-500 dark:text-neutral-500">
-          <MessageSquareMore size={20} />
+            <MessageSquareMore size={20} />
             <span className="ml-1 text-sm dark:text-neutral-400">
               {numberOfComments}
             </span>
