@@ -9,7 +9,7 @@ import Table from "../TableView";
 import ModalNewTask from "@/components/ModalNewTask";
 
 type Props = {
-  params: { id: string };
+  params: Record<string, string>; // Correctly type the params
 };
 
 const Project = ({ params }: Props) => {
