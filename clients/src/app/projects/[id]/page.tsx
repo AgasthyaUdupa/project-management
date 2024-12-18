@@ -8,12 +8,13 @@ import Timeline from "../TimelineView";
 import Table from "../TableView";
 import ModalNewTask from "@/components/ModalNewTask";
 
-type Props = {
-  params: Record<string, string>; // Correctly type the params
+// Define the dynamic route handler
+type PageProps = {
+  params: { id: string }; // params comes from the dynamic route
 };
 
-const Project = ({ params }: Props) => {
-  const { id } = params;
+const Project = ({ params }: PageProps) => {
+  const { id } = params; // Extract 'id' from params
   const [activeTab, setActiveTab] = useState("Board");
   const [isModalNewTaskOpen, setIsModalNewTaskOpen] = useState(false);
 
