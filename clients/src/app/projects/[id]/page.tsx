@@ -1,4 +1,5 @@
 "use client";
+
 import { useState } from "react";
 import Board from "../BoardView";
 import ProjectHeader from "@/app/projects/ProjectHeader";
@@ -7,19 +8,21 @@ import Timeline from "../TimelineView";
 import Table from "../TableView";
 import ModalNewTask from "@/components/ModalNewTask";
 
-
-type Props = {
-  params: { id: string };
+// Ensure the type matches Next.js's expected structure
+type PageProps = {
+  params: {
+    id: string;
+  };
 };
 
-const Project = ({ params }: Props) => {
-  const { id } = params;
+const Project = ({ params }: PageProps) => {
+  const { id } = params; // Destructure `id` from `params`
   const [activeTab, setActiveTab] = useState("Board");
   const [isModalNewTaskOpen, setIsModalNewTaskOpen] = useState(false);
 
   return (
     <div>
-         <ModalNewTask
+      <ModalNewTask
         isOpen={isModalNewTaskOpen}
         onClose={() => setIsModalNewTaskOpen(false)}
         id={id}
