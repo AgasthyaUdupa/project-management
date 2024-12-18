@@ -9,6 +9,7 @@ export interface Project {
 }
 
 export interface User {
+    name: string;
     userId?: number;
     username: string;
     email: string;
@@ -45,6 +46,7 @@ export enum Priority {
 }
 
 export interface Task {
+  createdBy:User ;
   id: number;
   title: string;
   description?: string;

@@ -62,14 +62,14 @@ const TaskColumn = ({
   const [{ isOver }, drop] = useDrop(() => ({
     accept: "task",
     drop: (item: { id: number }) => moveTask(item.id, status),
-    collect: (monitor: any) => ({
+    collect: (monitor) => ({
       isOver: !!monitor.isOver(),
     }),
   }));
 
   const tasksCount = tasks.filter((task) => task.status === status).length;
 
-  const statusColor: any = {
+  const statusColor: Record<string, string> = {
     "To Do": "#2563EB",
     "Work In Progress": "#059669",
     "Under Review": "#D97706",
@@ -78,14 +78,14 @@ const TaskColumn = ({
 
   return (
     <div
-      ref={(instance) => {
-        drop(instance);
-      }}
-      className={`sl:py-4 rounded-lg py-2 xl:px-2 ${isOver ? "bg-blue-100 dark:bg-neutral-950" : ""}`}
-    >
+    ref={(instance) => {
+      drop(instance);
+    }}
+    className={`sl:py-4 rounded-lg py-2 xl:px-2 ${isOver ? "bg-blue-100 dark:bg-neutral-950" : ""}`}
+  >
       <div className="mb-3 flex w-full">
         <div
-          className={`w-2 !bg-[${statusColor[status]}] rounded-s-lg`}
+          className="w-2 rounded-s-lg"
           style={{ backgroundColor: statusColor[status] }}
         />
         <div className="flex w-full items-center justify-between rounded-e-lg bg-white px-5 py-4 dark:bg-dark-secondary">
@@ -111,7 +111,6 @@ const TaskColumn = ({
           </div>
         </div>
       </div>
-
       {tasks
         .filter((task) => task.status === status)
         .map((task) => (
@@ -129,7 +128,7 @@ const Task = ({ task }: TaskProps) => {
   const [{ isDragging }, drag] = useDrag(() => ({
     type: "task",
     item: { id: task.id },
-    collect: (monitor: any) => ({
+    collect: (monitor) => ({
       isDragging: !!monitor.isDragging(),
     }),
   }));
@@ -145,18 +144,19 @@ const Task = ({ task }: TaskProps) => {
 
   const numberOfComments = (task.comments && task.comments.length) || 0;
 
+  const defaultProfileImage = "/placeholder-profile.png";
+  const defaultAttachmentImage = "/placeholder-attachment.png";
+
   const PriorityTag = ({ priority }: { priority: TaskType["priority"] }) => (
     <div
       className={`rounded-full px-2 py-1 text-xs font-semibold ${
         priority === "Urgent"
           ? "bg-red-200 text-red-700"
           : priority === "High"
-            ? "bg-yellow-200 text-yellow-700"
-            : priority === "Medium"
-              ? "bg-green-200 text-green-700"
-              : priority === "Low"
-                ? "bg-blue-200 text-blue-700"
-                : "bg-gray-200 text-gray-700"
+          ? "bg-yellow-200 text-yellow-700"
+          : priority === "Low"
+          ? "bg-blue-200 text-blue-700"
+          : "bg-gray-200 text-gray-700"
       }`}
     >
       {priority}
@@ -165,17 +165,17 @@ const Task = ({ task }: TaskProps) => {
 
   return (
     <div
-      ref={(instance) => {
-        drag(instance);
-      }}
-      className={`mb-4 rounded-md bg-white shadow dark:bg-dark-secondary ${
-        isDragging ? "opacity-50" : "opacity-100"
-      }`}
-    >
+    ref={(instance) => {
+      drag(instance);
+    }}
+    className={`mb-4 rounded-md bg-white shadow dark:bg-dark-secondary ${
+      isDragging ? "opacity-50" : "opacity-100"
+    }`}
+  >
       {task.attachments && task.attachments.length > 0 && (
         <Image
-          src={`https://pm-s3-images.s3.us-east-2.amazonaws.com/${task.attachments[0].fileURL}`}
-          alt={task.attachments[0].fileName}
+          src={task.attachments[0]?.fileURL || defaultAttachmentImage}
+          alt={task.attachments[0]?.fileName || "Attachment"}
           width={400}
           height={200}
           className="h-auto w-full rounded-t-md"
@@ -191,7 +191,6 @@ const Task = ({ task }: TaskProps) => {
                   key={tag}
                   className="rounded-full bg-blue-100 px-2 py-1 text-xs"
                 >
-                  {" "}
                   {tag}
                 </div>
               ))}
@@ -201,7 +200,6 @@ const Task = ({ task }: TaskProps) => {
             <EllipsisVertical size={26} />
           </button>
         </div>
-
         <div className="my-3 flex justify-between">
           <h4 className="text-md font-bold dark:text-white">{task.title}</h4>
           {typeof task.points === "number" && (
@@ -210,7 +208,6 @@ const Task = ({ task }: TaskProps) => {
             </div>
           )}
         </div>
-
         <div className="text-xs text-gray-500 dark:text-neutral-500">
           {formattedStartDate && <span>{formattedStartDate} - </span>}
           {formattedDueDate && <span>{formattedDueDate}</span>}
@@ -218,37 +215,29 @@ const Task = ({ task }: TaskProps) => {
         <p className="text-sm text-gray-600 dark:text-neutral-500">
           {task.description}
         </p>
-        <div className="mt-4 border-t border-gray-200 dark:border-stroke-dark" />
-
-        {/* Users */}
-        <div className="mt-3 flex items-center justify-between">
-          <div className="flex -space-x-[6px] overflow-hidden">
-            {task.assignee && (
+        <div className="mt-4 border-t border-gray-200 dark:border-stroke-dark pt-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center">
               <Image
-                key={task.assignee.userId}
-                src={`https://pm-s3-images.s3.us-east-2.amazonaws.com/${task.assignee.profilePictureUrl!}`}
-                alt={task.assignee.username}
-                width={30}
-                height={30}
-                className="h-8 w-8 rounded-full border-2 border-white object-cover dark:border-dark-secondary"
+                src={task.createdBy?.profilePictureUrl || defaultProfileImage}
+                alt="User"
+                width={32}
+                height={32}
+                className="h-8 w-8 rounded-full object-cover"
               />
-            )}
-            {task.author && (
-              <Image
-                key={task.author.userId}
-                src={`https://pm-s3-images.s3.us-east-2.amazonaws.com/${task.author.profilePictureUrl!}`}
-                alt={task.author.username}
-                width={30}
-                height={30}
-                className="h-8 w-8 rounded-full border-2 border-white object-cover dark:border-dark-secondary"
+              <span className="ml-2 text-xs dark:text-white">
+                {task.createdBy?.name || "Unknown User"}
+              </span>
+            </div>
+            <div className="flex items-center">
+              <MessageSquareMore
+                size={16}
+                className="mr-2 text-gray-500 dark:text-neutral-500"
               />
-            )}
-          </div>
-          <div className="flex items-center text-gray-500 dark:text-neutral-500">
-            <MessageSquareMore size={20} />
-            <span className="ml-1 text-sm dark:text-neutral-400">
-              {numberOfComments}
-            </span>
+              <span className="text-xs dark:text-neutral-500">
+                {numberOfComments}
+              </span>
+            </div>
           </div>
         </div>
       </div>
