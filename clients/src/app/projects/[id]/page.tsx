@@ -8,17 +8,35 @@ import Timeline from "../TimelineView";
 import Table from "../TableView";
 import ModalNewTask from "@/components/ModalNewTask";
 
-// Ensure the type matches Next.js's expected structure
-type PageProps = {
+// Ensure type compatibility
+interface PageProps {
   params: {
     id: string;
   };
-};
+}
 
-const Project = ({ params }: PageProps) => {
-  const { id } = params; // Destructure `id` from `params`
+const Project = (props: PageProps | Promise<PageProps>) => {
   const [activeTab, setActiveTab] = useState("Board");
   const [isModalNewTaskOpen, setIsModalNewTaskOpen] = useState(false);
+
+  // Handle `params` synchronously or asynchronously
+  const [resolvedParams, setResolvedParams] = useState<PageProps["params"] | null>(null);
+
+  // Resolve params if necessary
+  if ("then" in props) {
+    props.then((resolved) => {
+      setResolvedParams(resolved.params);
+    });
+  } else {
+    setResolvedParams(props.params);
+  }
+
+  // Prevent rendering until `params` are resolved
+  if (!resolvedParams) {
+    return <div>Loading...</div>;
+  }
+
+  const { id } = resolvedParams;
 
   return (
     <div>
